@@ -107,7 +107,7 @@ function build_android()
 {
   echo "build_android"
 
-  ANDROID_NDK=~/Library/Android/sdk/ndk-bundle
+  ANDROID_NDK=~/Library/Android/sdk/ndk/23.0.7599858
   ANDROID_BUILDTOOLS=${ANDROID_NDK}/toolchains/llvm/prebuilt/darwin-x86_64/bin
 
   if [ -d "libs.android" ]; then
@@ -135,8 +135,8 @@ using clang : armv7
 :
 ${ANDROID_BUILDTOOLS}/armv7a-linux-androideabi21-clang++
 :
-<ranlib>${ANDROID_BUILDTOOLS}/arm-linux-androideabi-ranlib
-<archiver>${ANDROID_BUILDTOOLS}/arm-linux-androideabi-ar
+<ranlib>${ANDROID_BUILDTOOLS}/llvm-ranlib
+<archiver>${ANDROID_BUILDTOOLS}/llvm-ar
 <compileflags>-fPIC
 ;
 
@@ -144,17 +144,8 @@ using clang : arm64
 :
 ${ANDROID_BUILDTOOLS}/aarch64-linux-android21-clang++
 :
-<ranlib>${ANDROID_BUILDTOOLS}/aarch64-linux-android-ranlib
-<archiver>${ANDROID_BUILDTOOLS}/aarch64-linux-android-ar
-<compileflags>-fPIC
-;
-
-using clang : x86
-:
-${ANDROID_BUILDTOOLS}/i686-linux-android21-clang++
-:
-<ranlib>${ANDROID_BUILDTOOLS}/i686-linux-android-ranlib
-<archiver>${ANDROID_BUILDTOOLS}/i686-linux-android-ar
+<ranlib>${ANDROID_BUILDTOOLS}/llvm-ranlib
+<archiver>${ANDROID_BUILDTOOLS}/llvm-ar
 <compileflags>-fPIC
 ;
 
@@ -162,8 +153,8 @@ using clang : x86_64
 :
 ${ANDROID_BUILDTOOLS}/x86_64-linux-android21-clang++
 :
-<ranlib>${ANDROID_BUILDTOOLS}/x86_64-linux-android-ranlib
-<archiver>${ANDROID_BUILDTOOLS}/x86_64-linux-android-ar
+<ranlib>${ANDROID_BUILDTOOLS}/llvm-ranlib
+<archiver>${ANDROID_BUILDTOOLS}/llvm-ar
 <compileflags>-fPIC
 ;
 EOS
@@ -184,19 +175,8 @@ EOS
   ./b2 \
   -j 8 \
   toolset=clang-arm64 \
-  --build-dir=../build/${ANDROID_BUILD_DIR}/arm64-v8a \
-  --stagedir=../build/${ANDROID_BUILD_DIR}/arm64-v8a/stage \
-  target-os=android \
-  link=static \
-  threading=multi \
-  threadapi=pthread \
-  stage
-
-  ./b2 \
-  -j 8 \
-  toolset=clang-x86 \
-  --build-dir=${ANDROID_BUILD_DIR}/android-build/x86 \
-  --stagedir=${ANDROID_BUILD_DIR}/android-build/x86/stage \
+  --build-dir=${ANDROID_BUILD_DIR}/arm64-v8a \
+  --stagedir=${ANDROID_BUILD_DIR}/arm64-v8a/stage \
   target-os=android \
   link=static \
   threading=multi \
@@ -221,12 +201,10 @@ EOS
   mkdir libs.android/armeabi-v7a
   mkdir libs.android/arm64-v8a
   mkdir libs.android/x86_64
-  mkdir libs.android/x86
 
-  cp ${ANDROID_BUILD_DIR}/armeabi-v7a/stage/lib/*  libs.android/armeabi-v7a
-  cp ${ANDROID_BUILD_DIR}/arm64-v8a/stage/lib/*    libs.android/arm64-v8a
-  cp ${ANDROID_BUILD_DIR}/x86_64/stage/lib/*       libs.android/x86_64
-  cp ${ANDROID_BUILD_DIR}/x86/stage/lib/*          libs.android/x86
+  cp ${ANDROID_BUILD_DIR}/armeabi-v7a/stage/lib/*.a  libs.android/armeabi-v7a
+  cp ${ANDROID_BUILD_DIR}/arm64-v8a/stage/lib/*.a    libs.android/arm64-v8a
+  cp ${ANDROID_BUILD_DIR}/x86_64/stage/lib/*.a       libs.android/x86_64
 
   tar cvfj libs.android.tar.bz2 libs.android
 } 
