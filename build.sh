@@ -149,6 +149,15 @@ ${ANDROID_BUILDTOOLS}/aarch64-linux-android21-clang++
 <compileflags>-fPIC
 ;
 
+using clang : x86
+:
+${ANDROID_BUILDTOOLS}/i686-linux-android21-clang++
+:
+<ranlib>${ANDROID_BUILDTOOLS}/llvm-ranlib
+<archiver>${ANDROID_BUILDTOOLS}/llvm-ar
+<compileflags>-fPIC
+;
+
 using clang : x86_64
 :
 ${ANDROID_BUILDTOOLS}/x86_64-linux-android21-clang++
@@ -185,6 +194,17 @@ EOS
 
   ./b2 \
   -j 8 \
+  toolset=clang-x86 \
+  --build-dir=${ANDROID_BUILD_DIR}/x86 \
+  --stagedir=${ANDROID_BUILD_DIR}/x86/stage \
+  target-os=android \
+  link=static \
+  threading=multi \
+  threadapi=pthread \
+  stage
+
+  ./b2 \
+  -j 8 \
   toolset=clang-x86_64 \
   --build-dir=${ANDROID_BUILD_DIR}/x86_64 \
   --stagedir=${ANDROID_BUILD_DIR}/x86_64/stage \
@@ -201,10 +221,12 @@ EOS
   mkdir libs.android/armeabi-v7a
   mkdir libs.android/arm64-v8a
   mkdir libs.android/x86_64
+  mkdir libs.android/x86
 
   cp ${ANDROID_BUILD_DIR}/armeabi-v7a/stage/lib/*.a  libs.android/armeabi-v7a
   cp ${ANDROID_BUILD_DIR}/arm64-v8a/stage/lib/*.a    libs.android/arm64-v8a
   cp ${ANDROID_BUILD_DIR}/x86_64/stage/lib/*.a       libs.android/x86_64
+  cp ${ANDROID_BUILD_DIR}/x86/stage/lib/*          libs.android/x86
 
   tar cvfj libs.android.tar.bz2 libs.android
 } 
